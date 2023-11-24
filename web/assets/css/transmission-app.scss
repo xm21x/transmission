@@ -405,14 +405,6 @@ $package-image: '../img/package.svg';
 $text-image: '../img/file-text.svg';
 $video-image: '../img/film.svg';
 
-@mixin mime-icon-compact($mime-icon) {
-  &[data-icon-multifile='true'] {
-    background-image: url($folder-image);
-    background-position: center;
-    background-size: 16px;
-  }
-}
-
 @mixin mime-icon($mime-icon) {
   // background-image: url($mime-icon);
   background-color: var(--color-fg-primary);
