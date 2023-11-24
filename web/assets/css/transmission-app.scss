@@ -14,15 +14,6 @@
   }
 }
 
-@mixin button {
-  border: 1px solid var(--color-border);
-  cursor: pointer;
-  display: inline-block;
-  padding: 3px;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
 /// GLOBAL
 
 :root {
