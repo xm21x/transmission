@@ -1,22 +1,11 @@
 // Colors related to torrent status
 
-/// MIXINS
-
-@mixin for-phone-only {
-  @media (max-width: 599px) {
-    @content;
-  }
-}
-
-@mixin for-tablet-portrait-up {
-  @media (min-width: 600px) {
-    @content;
-  }
-}
-
 /// GLOBAL
 
 :root {
+  --max-phone-width: 599px;
+  --min-tablet-width: 600px;
+
   // Z-INDEX ENUM
   --z-index-progressbar: 1;
   --z-index-popup: 2;
@@ -354,7 +343,7 @@ a {
   height: 30px;
   padding-left: 5px;
 
-  @include for-phone-only {
+  @media (max-width: 599) /*var(--max-phone-width) */ {
     :not(select):not(input):not(option):not(.flexible-space) {
       display: none;
     }
@@ -767,7 +756,7 @@ $video-image: '../img/film.svg';
 
 /// PREFERENCES DIALOG
 
-@include for-phone-only {
+@media (max-width: 599) /*var(--max-phone-width) */ {
   input[type='checkbox'] {
     height: 20px;
     width: 20px;
@@ -776,10 +765,11 @@ $video-image: '../img/film.svg';
 
 #inspector,
 #prefs-dialog {
-  @include for-phone-only {
+  @media (max-width: 599) /*var(--max-phone-width) */ {
     left: 0;
   }
-  @include for-tablet-portrait-up {
+
+  @media (min-width: 600px) /*var(--min-tablet-width) */ {
     border-left: 1px solid var(--color-default-border);
     width: 570px;
   }
@@ -940,10 +930,10 @@ $video-image: '../img/film.svg';
   right: 0;
   top: var(--popup-top);
   z-index: var(--z-index-popup);
-  @include for-phone-only {
+  @media (max-width: 599) /*var(--max-phone-width) */ {
     left: 0;
   }
-  @include for-tablet-portrait-up {
+  @media (min-width: 600px) /*var(--min-tablet-width) */ {
     width: 550px;
   }
 }
@@ -980,10 +970,10 @@ $video-image: '../img/film.svg';
   flex: 1;
   overflow-x: hidden;
   overflow-y: auto;
-  @include for-phone-only {
+  @media (max-width: 599) /*var(--max-phone-width) */ {
     padding: 0 8px 20px;
   }
-  @include for-tablet-portrait-up {
+  @media (min-width: 600px) /*var(--min-tablet-width) */ {
     padding: 0 20px 20px;
   }
 }
@@ -1237,7 +1227,7 @@ $video-image: '../img/film.svg';
   .percent-done {
     width: 10%;
 
-    @include for-phone-only {
+    @media (max-width: 599) /*var(--max-phone-width) */ {
       width: 12%;
     }
   }
@@ -1252,7 +1242,7 @@ $video-image: '../img/film.svg';
     overflow-x: hidden;
     text-overflow: ellipsis;
 
-    @include for-phone-only {
+    @media (max-width: 599) /*var(--max-phone-width) */ {
       text-align: left;
       width: 20%;
     }
@@ -1262,7 +1252,7 @@ $video-image: '../img/film.svg';
     overflow-x: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    @include for-tablet-portrait-up {
+    @media (min-width: 600px) /*var(--min-tablet-width) */ {
       width: 20%;
     }
   }
@@ -1370,7 +1360,7 @@ $video-image: '../img/film.svg';
   top: 50px;
   z-index: var(--z-index-popup);
 
-  @include for-phone-only {
+  @media (max-width: 599) /*var(--max-phone-width) */ {
     height: 80vh;
   }
 
@@ -1499,7 +1489,7 @@ $video-image: '../img/film.svg';
 
 /// DIALOGS
 
-@include for-phone-only {
+@media (max-width: 599) /*var(--max-phone-width) */ {
   .dialog-buttons {
     padding-top: var(--dialog-logo-padding);
   }
@@ -1521,7 +1511,7 @@ $video-image: '../img/film.svg';
     flex-direction: column;
   }
 }
-@include for-tablet-portrait-up {
+@media (min-width: 600px) /*var(--min-tablet-width) */ {
   .dialog-container {
     min-width: 500px;
     position: absolute;
@@ -1589,7 +1579,7 @@ dialog {
   padding: 0;
   z-index: var(--z-index-popup);
 
-  @include for-tablet-portrait-up {
+  @media (min-width: 600px) /*var(--min-tablet-width) */ {
     border: 0;
     border-radius: 8px;
     max-width: 50%;
@@ -1708,10 +1698,10 @@ dialog {
     grid-template-columns: auto 1fr;
     margin-top: 4px;
 
-    @include for-phone-only {
+    @media (max-width: 599) /*var(--max-phone-width) */ {
       margin: 4px 0 16px;
     }
-    @include for-tablet-portrait-up {
+    @media (min-width: 600px) /*var(--min-tablet-width) */ {
       margin: 4px 16px 16px;
     }
 
