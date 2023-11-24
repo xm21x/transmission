@@ -69,6 +69,16 @@
   --default-border-light: #aeaeae;
   --default-tinted: rgba(128, 128, 144, 0.125);
 
+  // various dimensions
+  --toolbar-height: 50px;
+  --progressbar-border: 1px;
+  --progressbar-height: 20px;
+  --dialog-padding: 20px;
+  --dialog-logo-padding: calc(var(--dialog-padding) * 0.666);
+  --logo-size: 64px;
+  --pauseresume-size: 20px;
+  --popup-top: 51px; // TODO: ugly that this is hardcoded
+
   --progress: 100%;
   --color-fg-error: var(--red-500);
   --color-fg-port-closed: var(--red-500);
@@ -265,16 +275,13 @@ a {
 
 /// TOOLBAR
 
-$toolbar-height-number: 50;
-$toolbar-height: $toolbar-height-number * 1px;
-
 #mainwin-toolbar {
   align-items: center;
   background: var(--color-toolbar-background);
   border-bottom: 1px solid var(--color-default-border);
   display: flex;
   flex-direction: row;
-  height: $toolbar-height;
+  height: var(--toolbar-height);
   margin: 0;
   width: 100%;
 
@@ -285,11 +292,11 @@ $toolbar-height: $toolbar-height-number * 1px;
     border: 0;
     border-radius: 5px;
     cursor: pointer;
-    height: $toolbar-height;
+    height: var(--toolbar-height);
     margin-right: 6px;
     user-select: none;
     -webkit-user-select: none;
-    width: $toolbar-height;
+    width: var(--toolbar-height);
 
     svg {
       stroke: var(--color-fg-primary);
@@ -376,14 +383,12 @@ $toolbar-height: $toolbar-height-number * 1px;
   }
 }
 
-$speed-icon-size: 20px;
-
 .speed-up-icon,
 .speed-dn-icon {
   fill: var(--color-fg-primary);
 
   svg {
-    width: $speed-icon-size;
+    width: 20px;
   }
 }
 
@@ -393,11 +398,6 @@ $speed-icon-size: 20px;
 }
 
 /// TORRENT CONTAINER
-
-$pauseresume-size: 20px;
-$progressbar-border: 1;
-$progressbar-height: 20;
-$popup-top: 51px; // TODO: ugly that this is hardcoded
 
 .flexible-space {
   margin-right: auto;
@@ -663,9 +663,9 @@ $video-image: '../img/film.svg';
   .torrent-pauseresume-button {
     background-position: center center;
     background-repeat: no-repeat;
-    background-size: $pauseresume-size;
-    margin-left: calc($pauseresume-size / 2);
-    width: $pauseresume-size;
+    background-size: var(--pauseresume-size);
+    margin-left: calc(var(--pauseresume-size) / 2);
+    width: var(--pauseresume-size);
 
     &[data-action='pause'] {
       background-image: var(--image-pause-circle-idle);
@@ -692,7 +692,7 @@ $video-image: '../img/film.svg';
     border-radius: 3px;
     border-style: solid;
     border-width: 1px;
-    height: ($progressbar-height - ($progressbar-border * 2)) * 1px;
+    height: calc(var(--progressbar-height) - var(--progressbar-border) * 2);
 
     &.full {
       flex-grow: 1;
@@ -799,7 +799,7 @@ $video-image: '../img/film.svg';
   background: $background-color;
   bottom: 0;
   right: 0;
-  top: $popup-top;
+  top: var(--popup-top);
   z-index: var(--z-index-popup);
 
   .tabs-page {
@@ -947,7 +947,7 @@ $video-image: '../img/film.svg';
   flex-direction: column;
   position: absolute;
   right: 0;
-  top: $popup-top;
+  top: var(--popup-top);
   z-index: var(--z-index-popup);
   @include for-phone-only {
     left: 0;
@@ -1508,24 +1508,20 @@ $video-image: '../img/film.svg';
 
 /// DIALOGS
 
-$dialog-padding: 20px;
-$dialog-logo-padding: calc($dialog-padding * 0.666);
-$logo-size: 64px;
-
 @include for-phone-only {
   .dialog-buttons {
-    padding-top: $dialog-logo-padding;
+    padding-top: var(--dialog-logo-padding);
   }
 
   .dialog-container {
     opacity: 96%;
     position: absolute;
-    top: $popup-top;
+    top: var(--popup-top);
     width: 100%;
   }
 
   .dialog-logo {
-    padding-bottom: $dialog-logo-padding;
+    padding-bottom: var(--dialog-logo-padding);
   }
 
   .dialog-window {
@@ -1538,7 +1534,7 @@ $logo-size: 64px;
   .dialog-container {
     min-width: 500px;
     position: absolute;
-    top: $popup-top * 2;
+    top: calc(var(--popup-top) * 2);
   }
 
   .dialog-heading {
@@ -1547,7 +1543,7 @@ $logo-size: 64px;
 
   .dialog-logo {
     grid-area: icon;
-    padding-right: $dialog-logo-padding;
+    padding-right: var(--dialog-logo-padding);
   }
 
   .dialog-window {
@@ -1560,7 +1556,7 @@ $logo-size: 64px;
       'icon message'
       'icon workarea'
       'icon buttons';
-    grid-template-columns: $logo-size 1fr;
+    grid-template-columns: var(--logo-size) 1fr;
     padding: 2px 12px;
   }
 }
@@ -1618,8 +1614,8 @@ dialog {
 
 .dialog-logo {
   background: transparent url('../img/logo.png') top left no-repeat;
-  height: $logo-size;
-  width: $logo-size;
+  height: var(--logo-size);
+  width: var(--logo-size);
 }
 
 .dialog-message {
@@ -1630,7 +1626,7 @@ dialog {
 .dialog-window {
   background: var(--color-bg-primary);
   border-radius: 8px;
-  padding: $dialog-padding;
+  padding: var(--dialog-padding);
 }
 
 .dialog-workarea {
