@@ -1,8 +1,7 @@
-// Colors related to torrent status
-
-/// GLOBAL
-
 :root {
+  // If media queries supported css variables, we would use these.
+  // Until that day, embed them in comments by media queries so
+  // that at least it's easy to search for all the instances.
   --max-phone-width: 599px;
   --min-tablet-width: 600px;
 
