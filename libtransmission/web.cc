@@ -171,11 +171,6 @@ public:
     explicit Impl(Mediator& mediator_in)
         : mediator{ mediator_in }
     {
-        if (auto bundle = tr_env_get_string("CURL_CA_BUNDLE"); !std::empty(bundle))
-        {
-            curl_ca_bundle = std::move(bundle);
-        }
-
         share_setopt();
 
         if (curl_ssl_verify)
@@ -185,16 +180,6 @@ public:
                 fmt::format(_("Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"), fmt::arg("bundle", bundle)));
             tr_logAddInfo(_("NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"));
             tr_logAddInfo(_("NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"));
-        }
-
-        if (auto const& file = mediator.cookieFile(); file)
-        {
-            this->cookie_file = *file;
-        }
-
-        if (auto const& ua = mediator.userAgent(); ua)
-        {
-            this->user_agent = *ua;
         }
 
         auto const lock = std::unique_lock{ tasks_mutex_ };
@@ -396,10 +381,9 @@ public:
 
     Mediator& mediator;
 
-    std::string curl_ca_bundle;
-
-    std::string cookie_file;
-    std::string user_agent;
+    std::string const curl_ca_bundle = tr_env_get_string("CURL_CA_BUNDLE");
+    std::string const cookie_file = mediator.cookieFile().value_or("");
+    std::string const user_agent = std::string{ mediator.userAgent().value_or("") };
 
     std::unique_ptr<std::thread> curl_thread;
 
