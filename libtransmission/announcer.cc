@@ -241,7 +241,9 @@ std::unique_ptr<tr_announcer> tr_announcer::create(tr_session* session, tr_annou
 /* a row in tr_tier's list of trackers */
 struct tr_tracker
 {
-    explicit tr_tracker(tr_announcer_impl* announcer, tr_announce_list::tracker_info const& info)
+    tr_tracker() = default;
+
+    tr_tracker(tr_announcer_impl* announcer, tr_announce_list::tracker_info const& info)
         : host_and_port{ info.host_and_port }
         , announce_url{ info.announce }
         , sitename{ info.sitename }
@@ -337,16 +339,16 @@ struct tr_tracker
         return false;
     }
 
-    tr_interned_string const host_and_port;
-    tr_interned_string const announce_url;
-    std::string_view const sitename;
-    tr_scrape_info* const scrape_info;
+    tr_interned_string host_and_port;
+    tr_interned_string announce_url;
+    std::string_view sitename;
+    tr_scrape_info* scrape_info;
 
     std::string tracker_id;
 
-    int consecutive_failures = 0;
+    tr_tracker_id_t id;
 
-    tr_tracker_id_t const id;
+    int consecutive_failures = 0;
 
 private:
     std::optional<int64_t> seeder_count_;
