@@ -639,8 +639,14 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
         return {};
     }
 
+    auto benc = std::vector<char>{};
+    if (!tr_file_read(filename, benc))
+    {
+        return {};
+    }
+
     auto serde = tr_variant_serde::benc();
-    auto otop = serde.parse_file(filename);
+    auto otop = serde.inplace().parse(benc);
     if (!otop)
     {
         tr_logAddDebugTor(tor, fmt::format("Couldn't read '{}': {}", filename, serde.error_.message()));
