@@ -43,10 +43,10 @@
 
 using namespace std::literals;
 
-#define tr_logAddErrorTier(tier, msg) tr_logAddError(msg, (tier)->buildLogName())
-#define tr_logAddWarnTier(tier, msg) tr_logAddWarn(msg, (tier)->buildLogName())
-#define tr_logAddDebugTier(tier, msg) tr_logAddDebug(msg, (tier)->buildLogName())
-#define tr_logAddTraceTier(tier, msg) tr_logAddTrace(msg, (tier)->buildLogName())
+#define tr_logAddErrorTier(tier, msg) tr_logAddError(msg, (tier)->log_name())
+#define tr_logAddWarnTier(tier, msg) tr_logAddWarn(msg, (tier)->log_name())
+#define tr_logAddDebugTier(tier, msg) tr_logAddDebug(msg, (tier)->log_name())
+#define tr_logAddTraceTier(tier, msg) tr_logAddTrace(msg, (tier)->log_name())
 
 namespace
 {
@@ -446,6 +446,7 @@ struct tr_tier
         isScraping = false;
         lastAnnounceStartTime = 0;
         lastScrapeStartTime = 0;
+        log_name_.clear();
 
         return currentTracker();
     }
@@ -463,11 +464,16 @@ struct tr_tier
         return std::nullopt;
     }
 
-    [[nodiscard]] std::string buildLogName() const
+    [[nodiscard]] std::string_view log_name() const
     {
-        auto const* const current_tracker = currentTracker();
-        auto const host_and_port_sv = current_tracker == nullptr ? "?"sv : current_tracker->host_and_port.sv();
-        return fmt::format("{:s} at {:s}", tor->name(), host_and_port_sv);
+        if (std::empty(log_name_))
+        {
+            auto const* const current_tracker = currentTracker();
+            auto const host_and_port_sv = current_tracker == nullptr ? "?"sv : current_tracker->host_and_port.sv();
+            log_name_ = fmt::format("{:s} at {:s}", tor->name(), host_and_port_sv);
+        }
+
+        return log_name_;
     }
 
     [[nodiscard]] bool canManualAnnounce() const
@@ -494,6 +500,7 @@ struct tr_tier
 
     std::string last_announce_str;
     std::string last_scrape_str;
+    std::string mutable log_name_;
 
     /* number of up/down/corrupt bytes since the last time we sent an
      * "event=stopped" message that was acknowledged by the tracker */
@@ -936,7 +943,7 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
     req.numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : Numwant;
     req.key = tor->announce_key();
     req.partial_seed = tor->is_partial_seed();
-    req.log_name = tier->buildLogName();
+    req.log_name = tier->log_name();
     return req;
 }
 
@@ -1442,7 +1449,7 @@ void multiscrape(tr_announcer_impl* announcer, std::vector<tr_tier*> const& tier
         {
             auto* const req = &requests[request_count];
             req->scrape_url = scrape_info->scrape_url;
-            req->log_name = tier->buildLogName();
+            req->log_name = tier->log_name();
 
             req->info_hash[req->info_hash_count] = tier->tor->info_hash();
             ++req->info_hash_count;
