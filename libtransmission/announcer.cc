@@ -23,6 +23,8 @@
 
 #include <fmt/core.h>
 
+#include <small/vector.hpp>
+
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
 #include "libtransmission/transmission.h"
@@ -506,7 +508,7 @@ struct tr_tier
      * "event=stopped" message that was acknowledged by the tracker */
     std::array<uint64_t, 3> byteCounts = {};
 
-    std::vector<tr_tracker> trackers;
+    small::vector<tr_tracker, 1U> trackers;
 
     std::optional<size_t> current_tracker_index_;
 
