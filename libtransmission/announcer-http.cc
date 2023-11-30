@@ -233,6 +233,7 @@ void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_announce_req
     if (!std::empty(req.tracker_id))
     {
         fmt::format_to(out, "&trackerid={}", req.tracker_id);
+        fmt::print("&trackerid={}", req.tracker_id);
     }
 }
 
