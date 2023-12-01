@@ -59,6 +59,8 @@ public:
         }
     };
 
+    [[nodiscard]] static tr_interned_string url_to_host_and_port(tr_url_parsed_t const& url);
+
 private:
     using trackers_t = std::vector<tracker_info>;
 

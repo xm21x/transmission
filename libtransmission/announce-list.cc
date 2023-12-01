@@ -78,6 +78,16 @@ bool tr_announce_list::replace(tr_tracker_id_t id, std::string_view announce_url
     return add(announce_url_sv, tier);
 }
 
+// static
+tr_interned_string tr_announce_list::url_to_host_and_port(tr_url_parsed_t const& url)
+{
+    auto buf = std::array<char, 1024U>{};
+    auto* const begin = std::data(buf);
+    auto const* const end = fmt::format_to_n(begin, std::size(buf), "{:s}:{:d}", url.host, url.port).out;
+    auto const sv = std::string_view{ begin, static_cast<size_t>(end - begin) };
+    return tr_interned_string{ sv };
+}
+
 bool tr_announce_list::add(std::string_view announce_url_sv, tr_tracker_tier_t tier)
 {
     auto const announce = tr_urlParseTracker(announce_url_sv);
@@ -90,7 +100,7 @@ bool tr_announce_list::add(std::string_view announce_url_sv, tr_tracker_tier_t t
     tracker.announce = announce_url_sv;
     tracker.tier = get_tier(tier, *announce);
     tracker.id = next_unique_id();
-    tracker.host_and_port = fmt::format("{:s}:{:d}", announce->host, announce->port);
+    tracker.host_and_port = url_to_host_and_port(*announce);
     tracker.sitename = announce->sitename;
     tracker.query = announce->query;
 
