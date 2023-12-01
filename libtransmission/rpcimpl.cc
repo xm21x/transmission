@@ -502,6 +502,13 @@ namespace make_torrent_field_helpers
 
     return tr_variant::unmanaged_string(""sv);
 }
+
+[[nodiscard]] auto make_torrent_file(tr_torrent const& tor)
+{
+    auto filename = tr_pathbuf{};
+    tor.torrent_file(std::back_inserter(filename));
+    return tr_variant{ std::string{ filename.sv() } };
+}
 } // namespace make_torrent_field_helpers
 
 [[nodiscard]] auto constexpr isSupportedTorrentGetField(tr_quark key)
@@ -667,7 +674,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_source: return tor.source();
     case TR_KEY_startDate: return st.startDate;
     case TR_KEY_status: return st.activity;
-    case TR_KEY_torrentFile: return tor.torrent_file();
+    case TR_KEY_torrentFile: return make_torrent_file(tor);
     case TR_KEY_totalSize: return tor.total_size();
     case TR_KEY_trackerList: return tor.announce_list().to_string();
     case TR_KEY_trackerStats: return make_tracker_stats_vec(tor);

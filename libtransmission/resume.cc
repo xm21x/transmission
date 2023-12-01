@@ -633,7 +633,8 @@ tr_resume::fields_t load_from_file(tr_torrent* tor, tr_torrent::ResumeHelper& he
 
     tr_torrent_metainfo::migrate_file(tor->session->resumeDir(), tor->name(), tor->info_hash_string(), ".resume"sv);
 
-    auto const filename = tor->resume_file();
+    auto filename = tr_pathbuf{};
+    tor->resume_file(std::back_inserter(filename));
     if (!tr_sys_path_exists(filename))
     {
         return {};
@@ -924,7 +925,9 @@ void save(tr_torrent* const tor, tr_torrent::ResumeHelper const& helper)
     saveGroup(&top, tor);
 
     auto serde = tr_variant_serde::benc();
-    if (!serde.to_file(top, tor->resume_file()))
+    auto filename = tr_pathbuf{};
+    tor->resume_file(std::back_inserter(filename));
+    if (!serde.to_file(top, filename))
     {
         tor->error().set_local_error(fmt::format("Unable to save resume file: {:s}", serde.error_.message()));
     }

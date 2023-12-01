@@ -108,7 +108,9 @@ bool tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, tr_metadata_pi
         return {};
     }
 
-    auto in = std::ifstream{ tor->torrent_file(), std::ios_base::in };
+    auto filename = tr_pathbuf{};
+    tor->torrent_file(std::back_inserter(filename));
+    auto in = std::ifstream{ filename, std::ios_base::in };
     if (!in.is_open())
     {
         return {};
@@ -135,13 +137,17 @@ bool tr_torrentUseMetainfoFromFile(
     tr_error* error)
 {
     // add .torrent file
-    if (!tr_sys_path_copy(filename_in, tor->torrent_file().c_str(), error))
+    auto filename = tr_pathbuf{};
+    tor->torrent_file(std::back_inserter(filename));
+    if (!tr_sys_path_copy(filename_in, filename.c_str(), error))
     {
         return false;
     }
 
     // remove .magnet file
-    tr_sys_path_remove(tor->magnet_file());
+    filename.clear();
+    tor->magnet_file(std::back_inserter(filename));
+    tr_sys_path_remove(filename);
 
     // tor should keep this metainfo
     tor->set_metainfo(*metainfo);
@@ -244,13 +250,17 @@ bool use_new_metainfo(tr_torrent* tor, tr_error* error)
     }
 
     // save it
-    if (!tr_file_save(tor->torrent_file(), benc, error))
+    auto filename = tr_pathbuf{};
+    tor->torrent_file(std::back_inserter(filename));
+    if (!tr_file_save(filename, benc, error))
     {
         return false;
     }
 
     // remove .magnet file
-    tr_sys_path_remove(tor->magnet_file());
+    filename.clear();
+    tor->magnet_file(std::back_inserter(filename));
+    tr_sys_path_remove(filename);
 
     // tor should keep this metainfo
     tor->set_metainfo(metainfo);

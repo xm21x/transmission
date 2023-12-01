@@ -167,19 +167,22 @@ public:
 
     // UTILS
 
-    [[nodiscard]] auto torrent_file(std::string_view torrent_dir) const
+    template<typename Out>
+    [[nodiscard]] auto torrent_file(Out out, std::string_view torrent_dir) const
     {
-        return make_filename(torrent_dir, name(), info_hash_string(), BasenameFormat::Hash, ".torrent");
+        return make_filename(out, torrent_dir, name(), info_hash_string(), BasenameFormat::Hash, ".torrent");
     }
 
-    [[nodiscard]] auto magnet_file(std::string_view torrent_dir) const
+    template<typename Out>
+    [[nodiscard]] auto magnet_file(Out out, std::string_view torrent_dir) const
     {
-        return make_filename(torrent_dir, name(), info_hash_string(), BasenameFormat::Hash, ".magnet");
+        return make_filename(out, torrent_dir, name(), info_hash_string(), BasenameFormat::Hash, ".magnet");
     }
 
-    [[nodiscard]] auto resume_file(std::string_view resume_dir) const
+    template<typename Out>
+    [[nodiscard]] auto resume_file(Out out, std::string_view resume_dir) const
     {
-        return make_filename(resume_dir, name(), info_hash_string(), BasenameFormat::Hash, ".resume");
+        return make_filename(out, resume_dir, name(), info_hash_string(), BasenameFormat::Hash, ".resume");
     }
 
     static bool migrate_file(
@@ -205,16 +208,20 @@ private:
         NameAndPartialHash
     };
 
-    [[nodiscard]] static std::string make_filename(
+    template<typename Out>
+    static auto make_filename(
+        Out out,
         std::string_view dirname,
         std::string_view name,
-        std::string_view info_hash_string,
+        std::string_view info_hash_str,
         BasenameFormat format,
-        std::string_view suffix);
-
-    [[nodiscard]] auto make_filename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
+        std::string_view suffix)
     {
-        return make_filename(dirname, name(), info_hash_string(), format, suffix);
+        // `${dirname}/${name}.${info_hash}${suffix}`
+        // `${dirname}/${info_hash}${suffix}`
+        return format == BasenameFormat::NameAndPartialHash ?
+            fmt::format_to(out, "{:s}/{:s}.{:s}{:s}", dirname, name, info_hash_str.substr(0, 16), suffix) :
+            fmt::format_to(out, "{:s}/{:s}{:s}", dirname, info_hash_str, suffix);
     }
 
     tr_block_info block_info_ = tr_block_info{ 0, 0 };

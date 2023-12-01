@@ -664,55 +664,35 @@ bool tr_torrent_metainfo::parse_torrent_file(std::string_view filename, std::vec
     return tr_file_read(filename, *contents, error) && parse_benc({ std::data(*contents), std::size(*contents) }, error);
 }
 
-std::string tr_torrent_metainfo::make_filename(
-    std::string_view dirname,
-    std::string_view name,
-    std::string_view info_hash_string,
-    BasenameFormat format,
-    std::string_view suffix)
-{
-    // `${dirname}/${name}.${info_hash}${suffix}`
-    // `${dirname}/${info_hash}${suffix}`
-    auto filename = tr_pathbuf{ dirname, '/' };
-    if (format == BasenameFormat::Hash)
-    {
-        filename.append(info_hash_string);
-    }
-    else
-    {
-        filename.append(name, '.', info_hash_string.substr(0, 16));
-    }
-    filename.append(suffix);
-    return std::string{ filename.sv() };
-}
-
 bool tr_torrent_metainfo::migrate_file(
     std::string_view dirname,
     std::string_view name,
     std::string_view info_hash_string,
     std::string_view suffix)
 {
-    auto const old_filename = make_filename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
-    if (!tr_sys_path_exists(old_filename))
+    auto old_name = tr_pathbuf{};
+    make_filename(std::back_inserter(old_name), dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
+    if (!tr_sys_path_exists(old_name))
     {
         return false;
     }
 
-    auto const new_filename = make_filename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
-    if (tr_sys_path_exists(new_filename))
+    auto new_name = tr_pathbuf{};
+    make_filename(std::back_inserter(new_name), dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
+    if (tr_sys_path_exists(new_name))
     {
-        tr_sys_path_remove(old_filename);
+        tr_sys_path_remove(old_name);
         return false;
     }
 
-    auto const renamed = tr_sys_path_rename(old_filename, new_filename);
+    auto const renamed = tr_sys_path_rename(old_name, new_name);
     if (!renamed)
     {
         tr_logAddError(
             fmt::format(
                 _("Migrated torrent file from '{old_path}' to '{path}'"),
-                fmt::arg("old_path", old_filename),
-                fmt::arg("path", new_filename)),
+                fmt::arg("old_path", old_name),
+                fmt::arg("path", new_name)),
             name);
         return true;
     }
@@ -726,9 +706,11 @@ void tr_torrent_metainfo::remove_file(
     std::string_view info_hash_string,
     std::string_view suffix)
 {
-    auto filename = make_filename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
+    auto filename = tr_pathbuf{};
+    make_filename(std::back_inserter(filename), dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
     tr_sys_path_remove(filename, nullptr);
 
-    filename = make_filename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
+    filename.clear();
+    make_filename(std::back_inserter(filename), dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
     tr_sys_path_remove(filename, nullptr);
 }

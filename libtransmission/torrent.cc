@@ -1002,7 +1002,15 @@ void tr_torrent::init(tr_ctor const& ctor)
             [](auto mtime) { return mtime > 0; });
     }
 
-    auto const filename = has_metainfo() ? torrent_file() : magnet_file();
+    auto filename = tr_pathbuf{};
+    if (has_metainfo())
+    {
+        torrent_file(std::back_inserter(filename));
+    }
+    else
+    {
+        magnet_file(std::back_inserter(filename));
+    }
 
     // if we don't have a local .torrent or .magnet file already,
     // assume the torrent is new
@@ -1477,7 +1485,9 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
 
 std::string tr_torrentFilename(tr_torrent const* tor)
 {
-    return std::string{ tor->torrent_file() };
+    auto ret = std::string{};
+    tor->torrent_file(std::back_inserter(ret));
+    return ret;
 }
 
 size_t tr_torrentFilenameToBuf(tr_torrent const* tor, char* buf, size_t buflen)
@@ -1969,15 +1979,15 @@ bool tr_torrent::set_announce_list(tr_announce_list announce_list)
 
     // save the changes
     auto save_error = tr_error{};
-    auto filename = std::string{};
+    auto filename = tr_pathbuf{};
     if (has_metainfo())
     {
-        filename = torrent_file();
+        torrent_file(std::back_inserter(filename));
         tgt.save(filename, &save_error);
     }
     else
     {
-        filename = magnet_file();
+        magnet_file(std::back_inserter(filename));
         tr_file_save(filename, magnet(), &save_error);
     }
 
